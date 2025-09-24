@@ -2,8 +2,9 @@ import java.io.IOException;
 public class Lanzador {
     public static int devolverPing(String host) {
 
+        System.out.println("[OK]");
         ProcessBuilder pb = new ProcessBuilder("ping","-c","4", host);
-        pb.inheritIO();
+        System.out.println("[OK] " + pb.inheritIO().command());
         try {
             Process p = pb.start();
             int codSalida = p.waitFor();

@@ -15,9 +15,9 @@ public class Main {
                 Lanzador lanzador = new Lanzador();
                 int resultado = lanzador.devolverPing(host);
                 if (resultado == 0) {
-                    System.out.println("El host " + host + " es alcanzable.");
+                    System.out.println("Operación completada con éxito. Codigo de salida: " + resultado);
                 } else {
-                    System.out.println("El host " + host + " no es alcanzable.");
+                    System.out.println("Operación fallida. Codigo de salida: " + resultado);
                 }
             }
         }
