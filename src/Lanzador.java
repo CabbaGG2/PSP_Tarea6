@@ -1,23 +1,48 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+
 public class Lanzador {
-    public static int devolverPing(String host) {
+    public static int devolverPing(String host) throws IOException, InterruptedException {
 
-        System.out.println("[OK]");
-        ProcessBuilder pb = new ProcessBuilder("ping","-c","4", host);
-        System.out.println("[OK] " + pb.inheritIO().command());
-        try {
-            Process p = pb.start();
-            int codSalida = p.waitFor();
+        System.out.print("Iniciando ping a " + host + " en " + devolverOS() + "... ");
+        ProcessBuilder pb;
+        if (devolverOS().equals("Windows")) {
+            pb = new ProcessBuilder("ping","-n","4", host);
+        } else {
+            pb = new ProcessBuilder("ping","-c","4", host);
+        }
 
-            //BufferedReader rd = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            //String linea;
-            //while ((linea = rd.readLine()) != null){
-              /*  System.out.println("Aqui deberia imprimir el ping si entra aqui");
-                System.out.println(linea);*/
-            return codSalida;
-        } catch (IOException | InterruptedException e) {
-            System.out.println("Ocurrio un error: " + e.getMessage());
+        Process p = pb.start();
+        /*
+        Esto solo se utiliza si queremos que el proceso hijo herede la entrada y salida del proceso padre
+        pb.inheritIO().command();
+         */
+        BufferedReader rd = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        String linea;
+        while ((linea = rd.readLine()) != null && ((!linea.toLowerCase().contains("no se pudo encontrar el host")) || (!linea.toLowerCase().contains("could not find host")))) {
+
+            System.out.println("[OK]: " + linea);
+        }
+        int codSalida = p.waitFor();
+        if (codSalida != 0) {
+            BufferedReader errReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            String errLine;
+            while ((errLine = errReader.readLine()) != null) {
+                System.out.println("[ERROR]: " + errLine);
+            }
             return -1;
         }
+
+        return codSalida;
+    }
+
+    public static String devolverOS(){
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            return "Windows";
+        } else {
+            return "Unix-like";
+        }
+
     }
 }
